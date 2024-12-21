@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>SwarMala - CSD</title>
+</head>
+<body>
+    <header>
+        <img src="playlist.svg" id="playlist-img">
+        <h2>Sangeet Se Judo</h2>
+        <img src="music.svg" id="music-img">
+    </header>
+    <main>
+        <div class="left">
+            <div class="song-image">
+                <img src="musicanim.gif" id="musicanim">
+            </div>
+            <div class="volume-div">
+                <div class="volume-img">
+                    <img src="volume.svg" id="vol-svg">
+                </div>
+                <input type="range" id="volume-range" onchange="volume()">
+            </div>
+        </div>
+        <div class="right">
+            <div class="details">
+                <h3 id="song-name">Badi Baat Chit</h3>
+                <h5 id="song-singer">Lash Curry</h5>
+            </div>
+            <input type="range" id="song-duration" onchange="duration()">
+            <div class="controls">
+                <div class="prev-img"><img src="prev.svg" id="prev-img" onclick="previousSong()"></div>
+                <div class="play-pause"><img src="play.svg" id="play-pause" onclick="playPause()"></div>
+                <div class="next-img"><img src="next.svg" id="next-img" onclick="nextSong()"></div>
+            </div>
+        </div>
+        <div class="playlist">
+            <div class="playlist-song">
+                <img src="image1.jpg">
+                <div class="song-details">
+                    <h2>Badi Baat Chit</h2>
+                    <h5>Lash Curry</h5>
+                </div>
+            </div>
+            <div class="playlist-song">
+                <img src="image2.webp">
+                <div class="song-details">
+                    <h2>Paisa Hai Toh</h2>
+                    <h5>Sachin-Jigar, Vishal Dadlani, MellowD</h5>
+                </div>
+            </div>
+            <div class="playlist-song">
+                <img src="image3.webp">
+                <div class="song-details">
+                    <h2>Raftaarein</h2>
+                    <h5>Shekhar Ravjiani, Vishal Dadlani</h5>
+                </div>
+            </div>
+            <div class="playlist-song">
+                <img src="image4.jpg">
+                <div class="song-details">
+                    <h2>Shubh Baller</h2>
+                    <h5>Shubh, Ikky</h5>
+                </div>
+            </div>
+            <div class="playlist-song">
+                <img src="image5.jpg">
+                <div class="song-details">
+                    <h2>Joota Japani</h2>
+                    <h5>KR$NA, Mukesh, Shankar - Jaikishan & Shailendra</h5>
+                </div>
+            </div>
+            <div class="playlist-song">
+                <img src="image6.jpg">
+                <div class="song-details">
+                    <h2>DAKU</h2>
+                    <h5>Chani Nattan</h5>
+                </div>
+            </div>
+            <div class="playlist-song">
+                <img src="image7.jpg">
+                <div class="song-details">
+                    <h2>Mirchi</h2>
+                    <h5>Divine</h5>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+
+<script>
+    let index=0;
+    let playingSong=false;
+    let musicAnim=document.querySelector("#musicanim");
+    let volSvg=document.querySelector("#vol-svg");
+    let playlistImg=document.querySelector("#playlist-img");
+    let playlist=document.querySelector(".playlist");
+    let playlistSong=document.querySelectorAll(".playlist-song");
+    let songRange=document.querySelector("#song-duration");
+    let volumeRange=document.querySelector("#volume-range");
+    let playPauseImg=document.querySelector("#play-pause");
+    let songName=document.querySelector("#song-name");
+    let songSinger=document.querySelector("#song-singer");
+    let songImage=document.querySelector(".song-image");
+    let track=document.createElement("audio");
+    let songs=[
+        {
+            name:"Badi Baat Chit",
+            path:"firstsong.mp3",
+            image:"image1.jpg",
+            singer:"Lash Curry"
+        },
+        {
+            name:"Paisa Hai Toh",
+            path:"secondsong.mp3",
+            image:"image2.webp",
+            singer:" Sachin-Jigar, Vishal Dadlani, MellowD"
+        },
+        {
+            name:"Raftaarein",
+            path:"thirdsong.mp3",
+            image:"image3.webp",
+            singer:"Shekhar Ravjiani, Vishal Dadlani"
+        },
+        {
+            name:"Shubh Baller",
+            path:"fourthsong.mp3",
+            image:"image4.jpg",
+            singer:"Shubh, Ikky"
+        },
+        {
+            name:"Joota Japani",
+            path:"fifthsong.mp3",
+            image:"image5.jpg",
+            singer:"KR$NA, Mukesh, Shankar - Jaikishan & Shailendra"
+        },
+        {
+            name:"DAKU",
+            path:"sixthsong.mp3",
+            image:"image6.jpg",
+            singer:"Chani Nattan"
+        },
+        {
+            name:"Mirchi",
+            path:"seventhsong.mp3",
+            image:"image7.jpg",
+            singer:"Divine"
+        }
+    ]
+
+    function loadTrack(index){
+        track.src=songs[index].path;
+        songName.innerHTML=songs[index].name;
+        songSinger.innerHTML=songs[index].singer;
+        songImage.style=`background-image: url("${songs[index].image}");`
+        volume()
+        setInterval(()=>{
+            songRange.max=track.duration
+            songRange.value=track.currentTime
+        },1000)
+        track.loop=true;
+        track.load()
+    }
+    loadTrack(index);
+
+    function playPause(){
+        if(playingSong==false){
+            playSong()
+        }else{
+            pauseSong()
+        }
+    }
+
+    function playSong(){
+        track.play();
+        playingSong=true;
+        playPauseImg.src="pause.svg";
+        musicAnim.style.display="block";
+    }
+    function pauseSong(){
+        track.pause();
+        playingSong=false;
+        playPauseImg.src="play.svg";
+        musicAnim.style.display="none";
+    }
+    function nextSong(){
+        if(index<songs.length-1){
+            index++;
+            loadTrack(index);
+            playSong()
+        }else{
+            index=0;
+            loadTrack(index);
+            playSong()
+        }
+    }
+
+    function previousSong(){
+        if(index>0){
+            index--;
+            loadTrack(index);
+            playSong()
+        }else{
+            index=songs.length-1;
+            loadTrack(index);
+            playSong()
+        }
+    }
+
+    function volume(){
+        track.volume=volumeRange.value/100;
+        if(volumeRange.value==0){
+            volSvg.src="mute.svg"
+        }else{
+            volSvg.src="volume.svg"
+        }
+    }
+
+    function duration(){
+        track.currentTime=songRange.value
+    }
+
+    playlistImg.addEventListener("click",()=>{
+        playlist.classList.toggle("playlist-active")
+    if(playlist.classList.contains("playlist-active")){
+        playlistImg.src="cross.svg"
+        }else{
+            playlistImg.src="playlist.svg"
+        }
+    })
+
+    playlistSong.forEach((song,index)=>{
+        song.addEventListener("click",()=>{
+            loadTrack(index);
+            playSong()
+            playlist.classList.remove("playlist-active")
+            playlistImg.src="playlist.svg"
+        }) 
+    })
+</script>
+
+</html>
